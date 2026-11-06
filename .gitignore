@@ -1,0 +1,23 @@
+# build output
+out/
+target/
+build/
+*.class
+build-sources.txt
+
+# IDE folders
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+nbproject/
+
+# data written at runtime (added in a later step)
+data/*.csv
+receipts/
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Team Dream Cafe — Coffee Shop Management System</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232b1d15'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle'%3E%E2%98%95%3C/text%3E%3C/svg%3E" />
+<style>
+/* ============================================================
+   Team Dream Cafe — browser demo
+   Espresso + cream + matcha palette, serif headings.
+   ============================================================ */
+
+:root {
+  --espresso: #2b1d15;
+  --mocha: #5a3e2c;
+  --cream: #f6efe3;
+  --card: #ffffff;
+  --latte: #e4d5be;
+  --parchment: #f1e6d3;
+  --matcha: #5c7f3f;
+  --matcha-dark: #47642f;
+  --gold: #c99f62;
+  --ink: #2a211b;
+  --muted: #867768;
+  --danger: #a6382a;
+  --radius: 14px;
+  --shadow: 0 10px 30px rgba(43, 29, 21, 0.08);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--ink);
+  margin: 0;
+}
+
+h1 { font-size: 26px; letter-spacing: 0.2px; }
+h2 { font-size: 19px; }
+h3 { font-size: 16px; }
+p { margin: 0; }
+
+.app { display: flex; min-height: 100vh; }
+
+/* ---------------- rail ---------------- */
+.rail {
+  width: 250px;
+  flex: 0 0 250px;
+  background: var(--espresso);
+  color: #f3e8da;
+  padding: 26px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  min-height: 100vh;
+  align-self: stretch;
+}
+
+.brand-name {
+  font-family: Georgia, serif;
+  font-weight: 700;
+  font-size: 23px;
+  letter-spacing: 1px;
+  color: #fff;
+}
+
+.brand-accent {
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  margin-top: 4px;
+}
+
+.brand-tag {
+  color: #c9b8a6;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.nav { display: flex; flex-direction: column; gap: 6px; margin-top: 26px; }
+
+.nav-item {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #f3e8da;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  padding: 11px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.nav-item:hover { background: #402d22; }
+.nav-item.active { background: var(--matcha); color: #fff; }
+.nav-item:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.rail-foot { margin-top: auto; color: #9c8a79; font-size: 12px; line-height: 1.6; }
+.rail-rule { height: 1px; background: #463327; margin-bottom: 12px; }
+
+/* ---------------- stage ---------------- */
+.stage { flex: 1; padding: 22px; min-width: 0; }
+
+.screen { display: none; animation: fade 0.18s ease; }
+.screen.active { display: block; }
+
+@keyframes fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+.screen-head { margin-bottom: 16px; }
+.screen-head p { color: var(--muted); margin-top: 5px; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--latte);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+/* ---------------- order screen ---------------- */
+.pos-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(380px, 34%, 430px);
+  gap: 16px;
+  align-items: start;
+}
+
+.menu-card,
+.order-card { min-width: 0; }
+
+.menu-card { display: flex; flex-direction: column; gap: 12px; }
+
+.filters { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.filters input,
+.filters select,
+.qty,
+.modal input,
+.modal select {
+  font: inherit;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--latte);
+  border-radius: 9px;
+  padding: 9px 11px;
+}
+
+.filters input { flex: 1; min-width: 150px; }
+.filters input:focus,
+.filters select:focus,
+.modal input:focus,
+.modal select:focus { outline: 2px solid var(--matcha); outline-offset: 1px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.chip {
+  border: 1px solid var(--latte);
+  background: var(--parchment);
+  color: var(--mocha);
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chip:hover { background: var(--latte); }
+.chip.active { background: var(--mocha); border-color: var(--mocha); color: #fff; }
+
+.drink-list {
+  height: 330px;
+  overflow-y: auto;
+  border: 1px solid var(--latte);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.drink-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--parchment);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.drink-row:last-child { border-bottom: 0; }
+.drink-row:hover { background: #fbf6ee; }
+.drink-row.selected { background: var(--mocha); color: #fff; }
+.drink-row.selected .drink-price { color: var(--latte); }
+
+.drink-name { font-weight: 600; }
+.drink-section { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+.drink-row.selected .drink-section { color: #d9c7b3; }
+.drink-price { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+.customizer { display: flex; flex-direction: column; gap: 10px; }
+
+.custom-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.custom-row.end { justify-content: flex-end; margin-top: 12px; }
+
+.label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--muted); }
+.qty-label { margin-left: 12px; }
+.qty { width: 66px; padding: 6px 8px; }
+
+.radio { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.radio input { accent-color: var(--matcha); }
+
+.addons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 10px;
+  border-top: 1px dashed var(--latte);
+  padding-top: 10px;
+}
+
+.addon {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.addon input { accent-color: var(--matcha); }
+.addon span.price { color: var(--muted); font-size: 11.5px; white-space: nowrap; }
+
+.feedback { font-size: 12px; flex: 1; }
+.feedback.ok { color: var(--matcha-dark); }
+.feedback.error { color: var(--danger); }
+.muted { color: var(--muted); }
+
+/* buttons */
+.btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 600;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+}
+
+.btn:active { transform: translateY(1px); }
+.btn.primary { background: var(--matcha); color: #fff; }
+.btn.primary:hover:not(:disabled) { background: var(--matcha-dark); }
+.btn.primary:disabled { background: #e6dccb; color: #9c8a79; cursor: not-allowed; }
+.btn.ghost { background: var(--parchment); color: var(--mocha); border-color: var(--latte); }
+.btn.ghost:hover { background: var(--latte); }
+.btn.danger { color: var(--danger); }
+.btn.wide { min-width: 140px; }
+.btn.small { padding: 6px 12px; font-size: 12px; }
+
+/* order card */
+.order-card { display: flex; flex-direction: column; }
+
+.order-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.order-head .muted { font-size: 12px; }
+
+.table-wrap { margin-top: 12px; overflow-x: auto; }
+
+table.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+.data-table th {
+  text-align: left;
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--mocha);
+  background: var(--parchment);
+  padding: 8px 10px;
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--parchment);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:hover { background: #fdf9f2; }
+.data-table .num { text-align: right; }
+.data-table td.num { font-variant-numeric: tabular-nums; }
+
+.item-extras { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+.order-card .data-table th,
+.order-card .data-table td { padding: 8px 6px; }
+
+.row-remove {
+  border: 0;
+  background: transparent;
+  color: var(--danger);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.row-remove:hover { background: #f6e2dd; }
+
+.empty-state {
+  color: var(--muted);
+  font-size: 12.5px;
+  padding: 22px 6px;
+  text-align: center;
+}
+
+.totals {
+  margin-top: 14px;
+  border-top: 1px solid var(--latte);
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.totals > div { display: flex; justify-content: space-between; }
+.totals .grand { align-items: baseline; margin-top: 4px; }
+.totals .grand span:first-child { font-family: Georgia, serif; font-weight: 700; font-size: 15px; }
+.totals .grand span:last-child {
+  font-family: Georgia, serif;
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--matcha-dark);
+}
+
+.hint { color: var(--muted); font-size: 12px; margin-top: 8px; }
+
+/* ---------------- stats / reports ---------------- */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat {
+  background: var(--card);
+  border: 1px solid var(--latte);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+}
+
+.stat span { display: block; font-size: 11px; letter-spacing: 0.8px; color: var(--muted); text-transform: uppercase; }
+.stat strong { display: block; font-family: Georgia, serif; font-size: 22px; margin-top: 6px; color: var(--ink); }
+
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.bar-row { margin-top: 12px; }
+.bar-row .bar-label { display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 5px; }
+.bar { height: 8px; border-radius: 99px; background: var(--parchment); overflow: hidden; }
+
+.bar > i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--matcha), var(--gold));
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.status-ok { background: #e8f0e0; color: var(--matcha-dark); }
+.status-low { background: #fbe6df; color: var(--danger); }
+
+/* ---------------- about ---------------- */
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.bullet-list { margin: 10px 0 0; padding-left: 18px; color: var(--ink); line-height: 1.85; font-size: 13px; }
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.member { display: flex; gap: 12px; align-items: center; }
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 50%;
+  background: var(--mocha);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+.member strong { display: block; font-size: 13.5px; }
+.member span { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* ---------------- modal ---------------- */
+#modal-root:empty { display: none; }
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(43, 29, 21, 0.55);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  z-index: 40;
+}
+
+.modal {
+  background: var(--card);
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(20, 12, 8, 0.35);
+  width: min(460px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 22px;
+}
+
+.modal h2 { margin-bottom: 4px; }
+.modal .muted { font-size: 12.5px; margin-bottom: 14px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.field label { font-size: 11px; letter-spacing: 0.8px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+
+.quick-cash { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+
+.summary-line { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; }
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-top: 1px solid var(--latte);
+  margin-top: 8px;
+  padding-top: 8px;
+  font-family: Georgia, serif;
+  font-weight: 700;
+  font-size: 17px;
+}
+
+.change-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  background: var(--parchment);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-top: 12px;
+  font-family: Georgia, serif;
+  font-size: 17px;
+}
+
+.change-due { color: var(--danger); font-family: inherit; font-size: 13px; }
+
+/* receipt */
+.receipt-sheet {
+  background: #fffdf9;
+  border: 1px dashed var(--latte);
+  border-radius: 12px;
+  padding: 20px;
+  font-family: "Courier New", ui-monospace, monospace;
+  font-size: 12.5px;
+  color: #33291f;
+}
+
+.receipt-sheet .r-head { text-align: center; }
+.receipt-sheet .r-brand { font-family: Georgia, serif; font-size: 18px; letter-spacing: 1px; }
+.receipt-sheet .r-sub { font-size: 11px; letter-spacing: 3px; color: var(--gold); margin-top: 2px; }
+.receipt-sheet .r-rule { border-top: 1px dashed var(--latte); margin: 10px 0; }
+.receipt-sheet table { width: 100%; border-collapse: collapse; }
+.receipt-sheet td { padding: 2px 0; vertical-align: top; }
+.receipt-sheet td.num { text-align: right; }
+.receipt-sheet .r-total { font-weight: 700; font-size: 13.5px; }
+.receipt-sheet .r-foot { text-align: center; font-size: 11px; color: var(--muted); margin-top: 10px; }
+
+/* toast */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translate(-50%, 20px);
+  background: var(--espresso);
+  color: #fff;
+  padding: 11px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.22s ease;
+  z-index: 60;
+}
+
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast.error { background: var(--danger); }
+
+/* ---------------- responsive-ish ---------------- */
+@media (max-width: 1120px) {
+  .pos-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 780px) {
+  .app { flex-direction: column; }
+  .rail {
+    width: 100%;
+    flex: none;
+    min-height: 0;
+    height: auto;
+    position: static;
+    padding: 18px 14px;
+  }
+  .nav { flex-direction: row; flex-wrap: wrap; margin-top: 14px; }
+  .nav-item { flex: 1 1 auto; text-align: center; }
+  .rail-foot { display: none; }
+  .stage { padding: 14px; }
+  .addons { grid-template-columns: 1fr; }
+  .drink-list { height: 280px; }
+  .data-table { font-size: 12px; }
+  .data-table th, .data-table td { padding: 7px 6px; }
+}
+
+/* ---------------- print: receipt only ---------------- */
+@media print {
+  body { background: #fff; }
+  body * { visibility: hidden; }
+  .receipt-sheet, .receipt-sheet * { visibility: visible; }
+  .receipt-sheet {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    border: 0;
+    padding: 0;
+    font-size: 12px;
+  }
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="rail">
+    <div class="brand">
+      <div class="brand-name">TEAM DREAM</div>
+      <div class="brand-accent">C A F E</div>
+      <div class="brand-tag">Coffee Shop Management</div>
+    </div>
+
+    <nav id="nav" class="nav">
+      <button class="nav-item active" data-screen="order">Order Taking</button>
+      <button class="nav-item" data-screen="history">Order History</button>
+      <button class="nav-item" data-screen="inventory">Inventory</button>
+      <button class="nav-item" data-screen="reports">Sales Report</button>
+      <button class="nav-item" data-screen="about">About the System</button>
+    </nav>
+
+    <div class="rail-foot">
+      <div class="rail-rule"></div>
+      <p>Build 1.0 &middot; browser demo</p>
+      <p>Java Swing version included</p>
+    </div>
+  </aside>
+
+  <main class="stage">
+    <!-- ================= ORDER TAKING ================= -->
+    <section class="screen active" id="screen-order">
+      <header class="screen-head">
+        <h1>Order Taking</h1>
+        <p>Choose a drink, set the cup size and extras, then add it to the order.</p>
+      </header>
+
+      <div class="pos-grid">
+        <div class="card menu-card">
+          <div class="filters">
+            <input id="search" type="search" placeholder="Search a drink by name" autocomplete="off" />
+            <select id="category-filter"></select>
+          </div>
+
+          <div class="chips" id="category-chips"></div>
+
+          <div class="drink-list" id="drink-list"></div>
+
+          <div class="customizer">
+            <div class="custom-row">
+              <span class="label">SIZE</span>
+              <label class="radio"><input type="radio" name="size" value="M" checked /><span>Medium</span></label>
+              <label class="radio"><input type="radio" name="size" value="L" /><span>Large</span></label>
+              <span class="label qty-label">QTY</span>
+              <input id="qty" class="qty" type="number" min="1" max="99" value="1" />
+            </div>
+
+            <div class="addons" id="addons"></div>
+
+            <div class="custom-row actions-row">
+              <span id="menu-feedback" class="feedback muted"></span>
+              <button id="add-btn" class="btn primary">Add to Order</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card order-card">
+          <div class="order-head">
+            <h2>Current Order</h2>
+            <span id="order-meta" class="muted"></span>
+          </div>
+
+          <div class="table-wrap">
+            <table class="data-table" id="order-table">
+              <thead>
+                <tr><th>Item</th><th>Size</th><th class="num">Qty</th><th class="num">Amount</th><th></th></tr>
+              </thead>
+              <tbody id="order-body"></tbody>
+            </table>
+            <p class="empty-state" id="order-empty">No items yet. Pick a drink on the left.</p>
+          </div>
+
+          <div class="totals">
+            <div><span>Subtotal</span><span id="subtotal">₱0.00</span></div>
+            <div><span>Discount</span><span id="summary-discount">−₱0.00</span></div>
+            <div class="grand"><span>TOTAL</span><span id="total">₱0.00</span></div>
+          </div>
+
+          <div class="custom-row end">
+            <button id="clear-btn" class="btn ghost danger">Clear order</button>
+            <button id="checkout-btn" class="btn primary wide" disabled>Checkout</button>
+          </div>
+          <p class="hint">Tip: click a drink once to select it, double-click to add it instantly.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= HISTORY ================= -->
+    <section class="screen" id="screen-history">
+      <header class="screen-head">
+        <h1>Order History</h1>
+        <p>Every completed sale is saved, with its receipt ready to view again.</p>
+      </header>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data-table" id="history-table">
+            <thead>
+              <tr><th>Reference</th><th>Date &amp; time</th><th class="num">Items</th><th class="num">Discount</th><th class="num">Total</th><th></th></tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+          </table>
+          <p class="empty-state" id="history-empty">No sales recorded yet — complete a checkout to see it here.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= INVENTORY ================= -->
+    <section class="screen" id="screen-inventory">
+      <header class="screen-head">
+        <h1>Inventory</h1>
+        <p>Cups, ingredients and add-ons are deducted automatically after every sale.</p>
+      </header>
+      <div class="stat-row" id="inventory-summary"></div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data-table" id="inventory-table">
+            <thead>
+              <tr><th>Item</th><th class="num">In stock</th><th>Level</th><th>Status</th><th>Restock</th></tr>
+            </thead>
+            <tbody id="inventory-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= REPORTS ================= -->
+    <section class="screen" id="screen-reports">
+      <header class="screen-head">
+        <h1>Sales Report</h1>
+        <p>Today at a glance, based on the sales saved in this browser.</p>
+      </header>
+      <div class="stat-row" id="report-stats"></div>
+      <div class="report-grid">
+        <div class="card">
+          <h3>Best sellers</h3>
+          <div id="best-sellers"></div>
+        </div>
+        <div class="card">
+          <h3>Sales per category</h3>
+          <div id="category-breakdown"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>All recorded sales</h3>
+        <div id="report-totals"></div>
+      </div>
+    </section>
+
+    <!-- ================= ABOUT ================= -->
+    <section class="screen" id="screen-about">
+      <header class="screen-head">
+        <h1>About the System</h1>
+        <p>A Coffee Shop Management System for Team Dream Cafe.</p>
+      </header>
+
+      <div class="about-grid">
+        <div class="card">
+          <h3>Modules</h3>
+          <ul class="bullet-list">
+            <li>Order taking with size, quantity and add-ons</li>
+            <li>Live order summary and peso totals</li>
+            <li>Checkout with discounts, cash and change</li>
+            <li>Printable receipt and saved order history</li>
+            <li>Inventory with automatic stock deduction</li>
+            <li>Sales report with best sellers</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>How it is built</h3>
+          <ul class="bullet-list">
+            <li><strong>Graded deliverable:</strong> Java 17 + Swing (OOP, GUI)</li>
+            <li>Model: MenuItem, Drink, AddOn, OrderItem, Order</li>
+            <li>Inheritance and polymorphism in pricing</li>
+            <li>Strategy pattern for discounts</li>
+            <li><strong>This browser demo:</strong> HTML, CSS and vanilla JavaScript</li>
+            <li>Same menu, prices and rules as the Java build</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Team Dream Cafe — group members</h3>
+        <div class="team-grid">
+          <div class="member">
+            <div class="avatar">JE</div>
+            <div><strong>John Evaris</strong><span>Group creator · project lead &amp; documentation</span></div>
+          </div>
+          <div class="member">
+            <div class="avatar">DC</div>
+            <div><strong>Decerick Chavez</strong><span>Menu model, pricing rules &amp; tests</span></div>
+          </div>
+          <div class="member">
+            <div class="avatar">KY</div>
+            <div><strong>Kenneth Clier Yusores</strong><span>Order-taking screen &amp; interface theme</span></div>
+          </div>
+          <div class="member">
+            <div class="avatar">KE</div>
+            <div><strong>Khyle Etolle</strong><span>Checkout, receipt, inventory &amp; reports</span></div>
+          </div>
+        </div>
+        <p class="hint">Swap the roles around if your actual task split is different — the docs/TEAM.md file has the same table.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="modal-root"></div>
+<div id="toast" class="toast"></div>
+
+<script>
+/* ============================================================
+   Team Dream Cafe — browser demo logic
+   Same menu, prices and rules as the Java Swing build.
+   Orders and stock are saved in localStorage, so a reload keeps them.
+   ============================================================ */
+
+const MENU = [
+  ["MCH-01", "Matcha Latte", "MATCHA_SERIES", 48, 58],
+  ["MCH-02", "Milktea Matcha", "MATCHA_SERIES", 48, 58],
+  ["MCH-03", "Dirty Matcha", "MATCHA_SERIES", 58, 68],
+  ["MCH-04", "Team Dream Matcha", "MATCHA_SERIES", 58, 68],
+  ["MCH-05", "White Chocolate Matcha", "MATCHA_SERIES", 58, 68],
+  ["MCH-06", "Strawberry Matcha", "MATCHA_SERIES", 68, 78],
+  ["MCH-07", "Chocolate Matcha", "MATCHA_SERIES", 68, 78],
+
+  ["COF-01", "Americano", "COFFEE_BASED", 48, 58],
+  ["COF-02", "Latte", "COFFEE_BASED", 48, 58],
+  ["COF-03", "Hazelnut Latte", "COFFEE_BASED", 48, 58],
+  ["COF-04", "Vanilla Latte", "COFFEE_BASED", 48, 58],
+  ["COF-05", "Brown Sugar Latte", "COFFEE_BASED", 48, 58],
+  ["COF-06", "Team Dream Signature", "COFFEE_BASED", 48, 58],
+
+  ["SPC-01", "White Mocha", "SPECIAL_COFFEE", 58, 68],
+  ["SPC-02", "Dark Mocha", "SPECIAL_COFFEE", 58, 68],
+  ["SPC-03", "Caramel Latte", "SPECIAL_COFFEE", 58, 68],
+  ["SPC-04", "Caramel Macchiato", "SPECIAL_COFFEE", 58, 68],
+  ["SPC-05", "White Caramel Mocha", "SPECIAL_COFFEE", 58, 68],
+  ["SPC-06", "Salted Caramel", "SPECIAL_COFFEE", 58, 68],
+  ["SPC-07", "Spanish Latte", "SPECIAL_COFFEE", 58, 68],
+  ["SPC-08", "Tres Leches Latte", "SPECIAL_COFFEE", 58, 68],
+  ["SPC-09", "Einspanner Latte", "SPECIAL_COFFEE", 58, 68],
+  ["SPC-10", "Choco Hazelnut", "SPECIAL_COFFEE", 58, 68],
+  ["SPC-11", "Caramel Coffee Jelly", "SPECIAL_COFFEE", 58, 68],
+  ["SPC-12", "Blueberry Greek Latte", "SPECIAL_COFFEE", 58, 68],
+
+  ["MTB-01", "Caramel", "MILK_TEA", 38, 48],
+  ["MTB-02", "Okinawa", "MILK_TEA", 38, 48],
+  ["MTB-03", "Wintermelon", "MILK_TEA", 38, 48],
+  ["MTB-04", "Brown Sugar", "MILK_TEA", 38, 48],
+  ["MTB-05", "Taro", "MILK_TEA", 48, 58],
+  ["MTB-06", "Mango", "MILK_TEA", 48, 58],
+  ["MTB-07", "Strawberry", "MILK_TEA", 48, 58],
+  ["MTB-08", "Choco Hazelnut", "MILK_TEA", 48, 58],
+  ["MTB-09", "Dark Chocolate", "MILK_TEA", 48, 58],
+
+  ["MLK-01", "Taro", "MILK_BASED", 48, 58],
+  ["MLK-02", "Mango", "MILK_BASED", 48, 58],
+  ["MLK-03", "Chocolate", "MILK_BASED", 48, 58],
+  ["MLK-04", "Strawberry", "MILK_BASED", 48, 58],
+
+  ["SML-01", "Choco Berry", "SPECIAL_MILK_BASED", 58, 68],
+  ["SML-02", "Mango Berry", "SPECIAL_MILK_BASED", 58, 68],
+  ["SML-03", "Choco Mango", "SPECIAL_MILK_BASED", 58, 68],
+  ["SML-04", "Brown Sugar Boba Milk", "SPECIAL_MILK_BASED", 58, 68],
+  ["SML-05", "Milo Dinosaur", "SPECIAL_MILK_BASED", 58, 68],
+
+  ["FT-01", "Lemon", "FRUIT_TEA", 38, 48],
+  ["FT-02", "Mango", "FRUIT_TEA", 38, 48],
+  ["FT-03", "Lychee", "FRUIT_TEA", 38, 48],
+  ["FT-04", "Blueberry", "FRUIT_TEA", 38, 48],
+  ["FT-05", "Green Apple", "FRUIT_TEA", 38, 48],
+  ["FT-06", "Strawberry", "FRUIT_TEA", 38, 48],
+  ["FT-07", "Honey Peach", "FRUIT_TEA", 38, 48],
+  ["FT-08", "Passion Fruit", "FRUIT_TEA", 38, 48],
+
+  ["FRC-01", "Dark Mocha", "FRAPPE_COFFEE", 68, 78],
+  ["FRC-02", "White Mocha", "FRAPPE_COFFEE", 68, 78],
+  ["FRC-03", "Choco Hazelnut", "FRAPPE_COFFEE", 68, 78],
+  ["FRC-04", "Team Dream Signature", "FRAPPE_COFFEE", 68, 78],
+  ["FRC-05", "Caramel Macchiato", "FRAPPE_COFFEE", 68, 78],
+  ["FRC-06", "Java Chip", "FRAPPE_COFFEE", 78, 88],
+  ["FRC-07", "Caramel Coffee Jelly", "FRAPPE_COFFEE", 78, 88],
+
+  ["FRM-01", "Matcha", "FRAPPE_MILK", 68, 78],
+  ["FRM-02", "Cookies and Cream", "FRAPPE_MILK", 68, 78],
+  ["FRM-03", "Chocolate", "FRAPPE_MILK", 78, 88],
+  ["FRM-04", "Taro", "FRAPPE_MILK", 78, 88],
+  ["FRM-05", "Mango", "FRAPPE_MILK", 78, 88],
+  ["FRM-06", "Strawberry", "FRAPPE_MILK", 78, 88],
+  ["FRM-07", "Milo Dinosaur", "FRAPPE_MILK", 78, 88]
+].map(function (row) {
+  return { id: row[0], name: row[1], cat: row[2], m: row[3], l: row[4] };
+});
+
+const CATEGORIES = [
+  ["MATCHA_SERIES", "Matcha Series"],
+  ["COFFEE_BASED", "Coffee Based"],
+  ["SPECIAL_COFFEE", "Special Coffee Based"],
+  ["MILK_TEA", "Milk Tea Baby"],
+  ["MILK_BASED", "Milk Based"],
+  ["SPECIAL_MILK_BASED", "Special Milk Based"],
+  ["FRUIT_TEA", "Fruit Tea Series"],
+  ["FRAPPE_COFFEE", "Frappe Coffee Based"],
+  ["FRAPPE_MILK", "Frappe Milk Based"]
+];
+
+const CAT_LABEL = {};
+CATEGORIES.forEach(function (pair) { CAT_LABEL[pair[0]] = pair[1]; });
+
+const ADDONS = [
+  { id: "milk", name: "Milk", price: 8 },
+  { id: "nata", name: "Nata", price: 8 },
+  { id: "pearls", name: "Pearls", price: 8 },
+  { id: "jelly", name: "Coffee Jelly", price: 8 },
+  { id: "syrup", name: "Flavoured Syrup", price: 8 },
+  { id: "coffee", name: "Coffee Shot", price: 18 },
+  { id: "whip", name: "Whipped Cream", price: 18 }
+];
+
+const DISCOUNTS = [
+  { id: "none", label: "No discount", rate: 0 },
+  { id: "senior", label: "Senior / PWD (20%)", rate: 0.2 },
+  { id: "promo", label: "Promo DREAM10 (10%)", rate: 0.1 }
+];
+
+const STOCK_DEFS = [
+  { id: "cupM", name: "16 oz cups", unit: "pcs", low: 60, start: 400 },
+  { id: "cupL", name: "22 oz cups", unit: "pcs", low: 60, start: 400 },
+  { id: "beans", name: "Coffee beans", unit: "g", low: 600, start: 6000 },
+  { id: "matcha", name: "Matcha powder", unit: "g", low: 300, start: 3000 },
+  { id: "tea", name: "Tea base", unit: "ml", low: 1200, start: 9000 },
+  { id: "milk", name: "Fresh milk", unit: "ml", low: 2500, start: 18000 },
+  { id: "pearls", name: "Tapioca pearls", unit: "g", low: 300, start: 2500 },
+  { id: "nata", name: "Nata de coco", unit: "g", low: 300, start: 2000 },
+  { id: "jelly", name: "Coffee jelly", unit: "g", low: 300, start: 2000 },
+  { id: "syrup", name: "Flavoured syrup", unit: "ml", low: 500, start: 4000 },
+  { id: "cream", name: "Whipped cream", unit: "servings", low: 20, start: 150 }
+];
+
+/* How each drink and add-on consumes stock. */
+const RECIPE = {
+  category: {
+    MATCHA_SERIES: ["matcha", 12],
+    COFFEE_BASED: ["beans", 18],
+    SPECIAL_COFFEE: ["beans", 18],
+    MILK_TEA: ["tea", 12],
+    MILK_BASED: ["milk", 160],
+    SPECIAL_MILK_BASED: ["milk", 160],
+    FRUIT_TEA: ["tea", 14],
+    FRAPPE_COFFEE: ["beans", 18],
+    FRAPPE_MILK: ["milk", 160]
+  },
+  addon: {
+    milk: ["milk", 30],
+    nata: ["nata", 30],
+    pearls: ["pearls", 30],
+    jelly: ["jelly", 30],
+    syrup: ["syrup", 20],
+    coffee: ["beans", 9],
+    whip: ["cream", 1]
+  }
+};
+
+const STORAGE_KEY = "teamdream-cafe-v1";
+
+/* ---------------- state ---------------- */
+
+let cart = [];
+let selectedId = null;
+let filterCat = "";
+let searchTerm = "";
+let db = loadDb();
+
+function defaultDb() {
+  const stock = {};
+  STOCK_DEFS.forEach(function (def) { stock[def.id] = def.start; });
+  return { orders: [], stock: stock, nextOrder: 1001 };
+}
+
+function loadDb() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) { return defaultDb(); }
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.orders) || !parsed.stock) { return defaultDb(); }
+    STOCK_DEFS.forEach(function (def) {
+      if (typeof parsed.stock[def.id] !== "number") { parsed.stock[def.id] = def.start; }
+    });
+    if (typeof parsed.nextOrder !== "number") { parsed.nextOrder = 1001 + parsed.orders.length; }
+    return parsed;
+  } catch (error) {
+    return defaultDb();
+  }
+}
+
+function saveDb() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); } catch (error) { /* storage may be blocked */ }
+}
+
+/* ---------------- helpers ---------------- */
+
+const $ = function (selector) { return document.querySelector(selector); };
+const round2 = function (value) { return Math.round(value * 100) / 100; };
+const peso = function (value) {
+  return "\u20B1" + round2(value).toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
+const compact = function (value) {
+  const rounded = round2(value);
+  return "\u20B1" + (rounded % 1 === 0 ? rounded.toLocaleString("en-PH") : rounded.toFixed(2));
+};
+
+function drinkById(id) { return MENU.find(function (drink) { return drink.id === id; }); }
+function addonById(id) { return ADDONS.find(function (addon) { return addon.id === id; }); }
+function orderRef() { return "TDC-" + db.nextOrder; }
+
+function lineUnitPrice(line) {
+  const drink = drinkById(line.drinkId);
+  const base = line.size === "L" ? drink.l : drink.m;
+  const extras = line.addons.reduce(function (sum, id) { return sum + addonById(id).price; }, 0);
+  return round2(base + extras);
+}
+
+function lineTotal(line) { return round2(lineUnitPrice(line) * line.qty); }
+function cartSubtotal() { return round2(cart.reduce(function (sum, line) { return sum + lineTotal(line); }, 0)); }
+function cartCount() { return cart.reduce(function (sum, line) { return sum + line.qty; }, 0); }
+
+function toast(message, isError) {
+  const el = $("#toast");
+  el.textContent = message;
+  el.className = "toast show" + (isError ? " error" : "");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(function () { el.className = "toast"; }, 2600);
+}
+
+/* ---------------- menu ---------------- */
+
+function renderCategoryOptions() {
+  const select = $("#category-filter");
+  select.innerHTML = '<option value="">All categories</option>' +
+    CATEGORIES.map(function (pair) { return '<option value="' + pair[0] + '">' + pair[1] + "</option>"; }).join("");
+
+  $("#category-chips").innerHTML = '<button class="chip active" data-cat="">All drinks</button>' +
+    CATEGORIES.map(function (pair) {
+      return '<button class="chip" data-cat="' + pair[0] + '">' + pair[1] + "</button>";
+    }).join("");
+}
+
+function renderAddons() {
+  $("#addons").innerHTML = ADDONS.map(function (addon) {
+    return '<label class="addon"><input type="checkbox" value="' + addon.id + '">' +
+      addon.name + ' <span class="price">+' + compact(addon.price) + "</span></label>";
+  }).join("");
+}
+
+function visibleMenu() {
+  const needle = searchTerm.trim().toLowerCase();
+  return MENU.filter(function (drink) {
+    if (filterCat && drink.cat !== filterCat) { return false; }
+    if (needle && drink.name.toLowerCase().indexOf(needle) === -1) { return false; }
+    return true;
+  });
+}
+
+function renderMenu() {
+  const drinks = visibleMenu();
+  const list = $("#drink-list");
+
+  if (!selectedId || !drinks.some(function (d) { return d.id === selectedId; })) {
+    selectedId = drinks.length ? drinks[0].id : null;
+  }
+
+  if (!drinks.length) {
+    list.innerHTML = '<p class="empty-state">No drinks match your search.</p>';
+    return;
+  }
+
+  list.innerHTML = drinks.map(function (drink) {
+    const selected = drink.id === selectedId ? " selected" : "";
+    return '<div class="drink-row' + selected + '" data-id="' + drink.id + '">' +
+      '<div><span class="drink-name">' + drink.name + '</span>' +
+      '<span class="drink-section">' + CAT_LABEL[drink.cat] + "</span></div>" +
+      '<span class="drink-price">M ' + compact(drink.m) + " &nbsp;|&nbsp; L " + compact(drink.l) + "</span></div>";
+  }).join("");
+}
+
+function setFeedback(message, isError) {
+  const el = $("#menu-feedback");
+  el.textContent = message;
+  el.className = "feedback " + (isError ? "error" : "ok");
+}
+
+/* ---------------- cart ---------------- */
+
+function addSelectedDrink() {
+  if (!selectedId) {
+    setFeedback("Pick a drink from the list first.", true);
+    return;
+  }
+
+  const qtyInput = $("#qty");
+  const quantity = Number(qtyInput.value);
+  if (!quantity || quantity < 1 || quantity > 99 || quantity % 1 !== 0) {
+    setFeedback("Quantity must be a whole number from 1 to 99.", true);
+    return;
+  }
+
+  const size = document.querySelector('input[name="size"]:checked').value;
+  const addons = Array.prototype.slice.call(document.querySelectorAll(".addon input:checked"))
+    .map(function (input) { return input.value; })
+    .sort();
+
+  const key = selectedId + "|" + size + "|" + addons.join(",");
+  const existing = cart.find(function (line) { return line.key === key; });
+
+  if (existing) {
+    existing.qty += quantity;
+  } else {
+    cart.push({ key: key, drinkId: selectedId, size: size, addons: addons, qty: quantity });
+  }
+
+  const drink = drinkById(selectedId);
+  setFeedback("Added " + quantity + " \u00D7 " + drink.name + " (" + (size === "L" ? "Large" : "Medium") + ").", false);
+  qtyInput.value = 1;
+  renderCart();
+}
+
+function renderCart() {
+  const body = $("#order-body");
+  const empty = $("#order-empty");
+
+  body.innerHTML = cart.map(function (line, index) {
+    const drink = drinkById(line.drinkId);
+    const extras = line.addons.length
+      ? '<small class="item-extras">+ ' + line.addons.map(function (id) { return addonById(id).name; }).join(", ") + "</small>"
+      : "";
+    return "<tr>" +
+      "<td>" + drink.name + extras + "</td>" +
+      "<td>" + line.size + "</td>" +
+      '<td class="num">' + line.qty + "</td>" +
+      '<td class="num">' + peso(lineTotal(line)) + "</td>" +
+      '<td><button class="row-remove" data-index="' + index + '" title="Remove line">\u00D7</button></td>' +
+      "</tr>";
+  }).join("");
+
+  empty.style.display = cart.length ? "none" : "block";
+
+  const subtotal = cartSubtotal();
+  $("#subtotal").textContent = peso(subtotal);
+  $("#summary-discount").textContent = "\u2212" + peso(0);
+  $("#total").textContent = peso(subtotal);
+  $("#order-meta").textContent = cart.length
+    ? orderRef() + "  \u00B7  " + cartCount() + " item(s)"
+    : orderRef();
+  $("#checkout-btn").disabled = cart.length === 0;
+  $("#clear-btn").disabled = cart.length === 0;
+}
+
+/* ---------------- checkout ---------------- */
+
+function openCheckout() {
+  if (!cart.length) {
+    toast("Add at least one drink first.", true);
+    return;
+  }
+
+  const subtotal = cartSubtotal();
+  const lines = cart.map(function (line) {
+    const drink = drinkById(line.drinkId);
+    const extras = line.addons.length
+      ? " + " + line.addons.map(function (id) { return addonById(id).name; }).join(", ")
+      : "";
+    return '<div class="summary-line"><span>' + line.qty + " \u00D7 " + drink.name +
+      " (" + line.size + ")" + extras + "</span><span>" + peso(lineTotal(line)) + "</span></div>";
+  }).join("");
+
+  openModal(
+    "<h2>Checkout</h2>" +
+    '<p class="muted">' + orderRef() + " \u00B7 " + cartCount() + " item(s)</p>" +
+    lines +
+    '<div class="field" style="margin-top:16px"><label for="discount">Discount</label>' +
+    '<select id="discount">' + DISCOUNTS.map(function (discount) {
+      return '<option value="' + discount.id + '">' + discount.label + "</option>";
+    }).join("") + "</select></div>" +
+    '<div class="field"><label for="cash">Cash tendered</label>' +
+    '<input id="cash" type="number" min="0" step="0.01" placeholder="0.00" />' +
+    '<div class="quick-cash">' +
+    [100, 200, 500, 1000].map(function (value) {
+      return '<button class="btn ghost small" data-cash="' + value + '">' + compact(value) + "</button>";
+    }).join("") +
+    '<button class="btn ghost small" data-cash="exact">Exact</button>' +
+    "</div></div>" +
+    '<div class="summary-line"><span>Subtotal</span><span>' + peso(subtotal) + "</span></div>" +
+    '<div class="summary-line"><span>Discount</span><span id="co-discount">\u2212' + peso(0) + "</span></div>" +
+    '<div class="summary-total"><span>TOTAL</span><span id="co-total">' + peso(subtotal) + "</span></div>" +
+    '<div class="change-line"><span>Change</span><span id="co-change">' + peso(0) + "</span></div>" +
+    '<div class="modal-actions"><button class="btn ghost" id="co-cancel">Cancel</button>' +
+    '<button class="btn primary" id="co-complete" disabled>Complete sale</button></div>',
+    function () { bindCheckout(subtotal); }
+  );
+}
+
+function bindCheckout(subtotal) {
+  const discountSelect = $("#discount");
+  const cashInput = $("#cash");
+  const completeBtn = $("#co-complete");
+  const state = { subtotal: subtotal, discount: 0, total: subtotal, rate: 0 };
+
+  function recalc() {
+    state.rate = DISCOUNTS.find(function (discount) { return discount.id === discountSelect.value; }).rate;
+    state.discount = round2(state.subtotal * state.rate);
+    state.total = round2(state.subtotal - state.discount);
+
+    $("#co-discount").textContent = "\u2212" + peso(state.discount);
+    $("#co-total").textContent = peso(state.total);
+
+    const changeEl = $("#co-change");
+    const cash = Number(cashInput.value);
+
+    if (!cashInput.value.trim()) {
+      changeEl.textContent = peso(0);
+      completeBtn.disabled = true;
+      return;
+    }
+    if (cash + 0.0001 < state.total) {
+      changeEl.innerHTML = '<span class="change-due">Short by ' + peso(state.total - cash) + "</span>";
+      completeBtn.disabled = true;
+      return;
+    }
+    changeEl.textContent = peso(cash - state.total);
+    completeBtn.disabled = false;
+  }
+
+  discountSelect.addEventListener("change", recalc);
+  cashInput.addEventListener("input", recalc);
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-cash]"), function (button) {
+    button.addEventListener("click", function () {
+      cashInput.value = button.dataset.cash === "exact" ? state.total : Number(button.dataset.cash);
+      recalc();
+    });
+  });
+
+  $("#co-cancel").addEventListener("click", closeModal);
+  completeBtn.addEventListener("click", function () { completeSale(state); });
+
+  recalc();
+  cashInput.focus();
+}
+
+function completeSale(state) {
+  const cash = Number($("#cash").value);
+  if (!cashInputValid(cash, state.total)) {
+    toast("Cash tendered must cover the total.", true);
+    return;
+  }
+
+  const order = {
+    ref: orderRef(),
+    at: new Date().toISOString(),
+    lines: cart.map(function (line) {
+      return { drinkId: line.drinkId, size: line.size, addons: line.addons.slice(), qty: line.qty };
+    }),
+    subtotal: state.subtotal,
+    discountLabel: DISCOUNTS.find(function (d) { return d.id === $("#discount").value; }).label,
+    discount: state.discount,
+    total: state.total,
+    cash: round2(cash),
+    change: round2(cash - state.total)
+  };
+
+  deductStock(order.lines);
+  db.orders.push(order);
+  db.nextOrder += 1;
+  saveDb();
+
+  cart = [];
+  renderCart();
+  renderHistory();
+  renderInventory();
+  renderReports();
+  closeModal();
+  showReceipt(order);
+}
+
+function cashInputValid(cash, total) { return cash >= total && cash > 0; }
+
+function deductStock(lines) {
+  lines.forEach(function (line) {
+    const drink = drinkById(line.drinkId);
+    addStock(line.size === "L" ? "cupL" : "cupM", -line.qty);
+
+    const base = RECIPE.category[drink.cat];
+    if (base) { addStock(base[0], -base[1] * line.qty); }
+
+    line.addons.forEach(function (id) {
+      const extra = RECIPE.addon[id];
+      if (extra) { addStock(extra[0], -extra[1] * line.qty); }
+    });
+  });
+}
+
+function addStock(id, delta) {
+  db.stock[id] = Math.max(0, round2(db.stock[id] + delta));
+}
+
+/* ---------------- receipt ---------------- */
+
+function showReceipt(order) {
+  const rows = order.lines.map(function (line) {
+    const drink = drinkById(line.drinkId);
+    const extras = line.addons.length
+      ? '<br><small>+ ' + line.addons.map(function (id) { return addonById(id).name; }).join(", ") + "</small>"
+      : "";
+    return "<tr><td>" + line.qty + " \u00D7 " + drink.name + " (" + line.size + ")" + extras +
+      '</td><td class="num">' + peso(lineTotal(line)) + "</td></tr>";
+  }).join("");
+
+  const when = new Date(order.at).toLocaleString("en-PH", {
+    month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit"
+  });
+
+  openModal(
+    '<div class="receipt-sheet">' +
+      '<div class="r-head"><div class="r-brand">TEAM DREAM CAFE</div>' +
+      '<div class="r-sub">COFFEE SHOP</div></div>' +
+      '<div class="r-rule"></div>' +
+      "<div>" + order.ref + "<br><small>" + when + "</small></div>" +
+      '<div class="r-rule"></div>' +
+      "<table>" + rows + "</table>" +
+      '<div class="r-rule"></div>' +
+      '<table><tr><td>Subtotal</td><td class="num">' + peso(order.subtotal) + "</td></tr>" +
+      "<tr><td>" + order.discountLabel + "</td><td class=\"num\">\u2212" + peso(order.discount) + "</td></tr>" +
+      '<tr class="r-total"><td>TOTAL</td><td class="num">' + peso(order.total) + "</td></tr>" +
+      '<tr><td>Cash</td><td class="num">' + peso(order.cash) + "</td></tr>" +
+      '<tr><td>Change</td><td class="num">' + peso(order.change) + "</td></tr></table>" +
+      '<div class="r-rule"></div>' +
+      '<div class="r-foot">Thank you for visiting Team Dream Cafe!<br>This serves as your official receipt.</div>' +
+    "</div>" +
+    '<div class="modal-actions"><button class="btn ghost" id="r-print">Print receipt</button>' +
+    '<button class="btn primary" id="r-close">Done</button></div>',
+    function () {
+      $("#r-close").addEventListener("click", closeModal);
+      $("#r-print").addEventListener("click", function () { window.print(); });
+    }
+  );
+}
+
+/* ---------------- history ---------------- */
+
+function renderHistory() {
+  const body = $("#history-body");
+  const empty = $("#history-empty");
+  const orders = db.orders.slice().reverse();
+
+  body.innerHTML = orders.map(function (order) {
+    const when = new Date(order.at).toLocaleString("en-PH", {
+      month: "short", day: "numeric", hour: "numeric", minute: "2-digit"
+    });
+    const items = order.lines.reduce(function (sum, line) { return sum + line.qty; }, 0);
+    return "<tr>" +
+      "<td><strong>" + order.ref + "</strong></td>" +
+      '<td class="muted">' + when + "</td>" +
+      '<td class="num">' + items + "</td>" +
+      '<td class="num muted">' + (order.discount > 0 ? order.discountLabel : "-") + "</td>" +
+      '<td class="num">' + peso(order.total) + "</td>" +
+      '<td><button class="btn ghost small" data-order="' + order.ref + '">View</button></td>' +
+      "</tr>";
+  }).join("");
+
+  empty.style.display = orders.length ? "none" : "block";
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-order]"), function (button) {
+    button.addEventListener("click", function () {
+      const order = db.orders.find(function (entry) { return entry.ref === button.dataset.order; });
+      if (order) { showReceipt(order); }
+    });
+  });
+}
+
+/* ---------------- inventory ---------------- */
+
+function renderInventory() {
+  const lowCount = STOCK_DEFS.filter(function (def) { return db.stock[def.id] <= def.low; }).length;
+
+  $("#inventory-summary").innerHTML =
+    statCard("Tracked items", String(STOCK_DEFS.length)) +
+    statCard("Low on stock", String(lowCount)) +
+    statCard("Cups remaining", (db.stock.cupM + db.stock.cupL).toLocaleString("en-PH"));
+
+  $("#inventory-body").innerHTML = STOCK_DEFS.map(function (def) {
+    const value = db.stock[def.id];
+    const percent = Math.max(2, Math.min(100, (value / def.start) * 100));
+    const isLow = value <= def.low;
+    return "<tr>" +
+      "<td>" + def.name + ' <span class="muted">(' + def.unit + ")</span></td>" +
+      '<td class="num">' + value.toLocaleString("en-PH") + "</td>" +
+      '<td><div class="bar"><i style="width:' + percent + '%"></i></div></td>' +
+      '<td><span class="status-pill ' + (isLow ? "status-low" : "status-ok") + '">' +
+        (isLow ? "LOW STOCK" : "OK") + "</span></td>" +
+      '<td><button class="btn ghost small" data-restock="' + def.id + '">Restock +25%</button></td>' +
+      "</tr>";
+  }).join("");
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-restock]"), function (button) {
+    button.addEventListener("click", function () {
+      const def = STOCK_DEFS.find(function (entry) { return entry.id === button.dataset.restock; });
+      db.stock[def.id] = round2(db.stock[def.id] + def.start * 0.25);
+      saveDb();
+      renderInventory();
+      toast("Restocked " + def.name + ".");
+    });
+  });
+}
+
+/* ---------------- reports ---------------- */
+
+function todaysOrders() {
+  const today = new Date().toDateString();
+  return db.orders.filter(function (order) { return new Date(order.at).toDateString() === today; });
+}
+
+function renderReports() {
+  const orders = todaysOrders();
+  const sales = round2(orders.reduce(function (sum, order) { return sum + order.total; }, 0));
+  const cups = orders.reduce(function (sum, order) {
+    return sum + order.lines.reduce(function (inner, line) { return inner + line.qty; }, 0);
+  }, 0);
+  const average = orders.length ? round2(sales / orders.length) : 0;
+
+  $("#report-stats").innerHTML =
+    statCard("Sales today", peso(sales)) +
+    statCard("Orders today", String(orders.length)) +
+    statCard("Average order", peso(average)) +
+    statCard("Cups sold today", String(cups));
+
+  const sellers = {};
+  orders.forEach(function (order) {
+    order.lines.forEach(function (line) {
+      const drink = drinkById(line.drinkId);
+      const key = drink.name + " (" + line.size + ")";
+      sellers[key] = (sellers[key] || 0) + line.qty;
+    });
+  });
+
+  const ranked = Object.keys(sellers)
+    .map(function (key) { return { name: key, qty: sellers[key] }; })
+    .sort(function (a, b) { return b.qty - a.qty; })
+    .slice(0, 6);
+
+  $("#best-sellers").innerHTML = ranked.length
+    ? ranked.map(function (entry) {
+        const width = Math.max(4, (entry.qty / ranked[0].qty) * 100);
+        return '<div class="bar-row"><div class="bar-label"><span>' + entry.name +
+          "</span><strong>" + entry.qty + " pc</strong></div>" +
+          '<div class="bar"><i style="width:' + width + '%"></i></div></div>';
+      }).join("")
+    : '<p class="empty-state">No sales recorded today yet.</p>';
+
+  const categories = {};
+  orders.forEach(function (order) {
+    order.lines.forEach(function (line) {
+      const label = CAT_LABEL[drinkById(line.drinkId).cat];
+      categories[label] = round2((categories[label] || 0) + lineTotal(line));
+    });
+  });
+
+  const catEntries = Object.keys(categories)
+    .map(function (key) { return { name: key, amount: categories[key] }; })
+    .sort(function (a, b) { return b.amount - a.amount; });
+
+  $("#category-breakdown").innerHTML = catEntries.length
+    ? catEntries.map(function (entry) {
+        const width = Math.max(4, (entry.amount / catEntries[0].amount) * 100);
+        return '<div class="bar-row"><div class="bar-label"><span>' + entry.name +
+          "</span><strong>" + peso(entry.amount) + "</strong></div>" +
+          '<div class="bar"><i style="width:' + width + '%"></i></div></div>';
+      }).join("")
+    : '<p class="empty-state">No sales recorded today yet.</p>';
+
+  const allSales = round2(db.orders.reduce(function (sum, order) { return sum + order.total; }, 0));
+  $("#report-totals").innerHTML = db.orders.length
+    ? '<div class="summary-line"><span>Total recorded sales</span><strong>' + peso(allSales) + "</strong></div>" +
+      '<div class="summary-line"><span>Completed orders</span><strong>' + db.orders.length + "</strong></div>" +
+      '<div class="summary-line"><span>Best seller overall</span><strong>' + bestSellerOverall() + "</strong></div>"
+    : '<p class="empty-state">Complete a checkout and this report fills in automatically.</p>';
+}
+
+function bestSellerOverall() {
+  const counts = {};
+  db.orders.forEach(function (order) {
+    order.lines.forEach(function (line) {
+      const name = drinkById(line.drinkId).name;
+      counts[name] = (counts[name] || 0) + line.qty;
+    });
+  });
+  const names = Object.keys(counts);
+  if (!names.length) { return "-"; }
+  names.sort(function (a, b) { return counts[b] - counts[a]; });
+  return names[0] + " (" + counts[names[0]] + " pc)";
+}
+
+function statCard(label, value) {
+  return '<div class="stat"><span>' + label + "</span><strong>" + value + "</strong></div>";
+}
+
+/* ---------------- modal ---------------- */
+
+function openModal(html, onReady) {
+  $("#modal-root").innerHTML = '<div class="modal-backdrop"><div class="modal">' + html + "</div></div>";
+  const backdrop = $(".modal-backdrop");
+  backdrop.addEventListener("click", function (event) {
+    if (event.target === backdrop) { closeModal(); }
+  });
+  document.addEventListener("keydown", onEscape);
+  if (onReady) { onReady(); }
+}
+
+function onEscape(event) {
+  if (event.key === "Escape") { closeModal(); }
+}
+
+function closeModal() {
+  $("#modal-root").innerHTML = "";
+  document.removeEventListener("keydown", onEscape);
+}
+
+/* ---------------- navigation + wiring ---------------- */
+
+function showScreen(name) {
+  Array.prototype.forEach.call(document.querySelectorAll(".screen"), function (screen) {
+    screen.classList.toggle("active", screen.id === "screen-" + name);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".nav-item"), function (button) {
+    button.classList.toggle("active", button.dataset.screen === name);
+  });
+}
+
+function wireEvents() {
+  Array.prototype.forEach.call(document.querySelectorAll(".nav-item"), function (button) {
+    button.addEventListener("click", function () { showScreen(button.dataset.screen); });
+  });
+
+  $("#search").addEventListener("input", function (event) {
+    searchTerm = event.target.value;
+    renderMenu();
+  });
+
+  $("#category-filter").addEventListener("change", function (event) {
+    filterCat = event.target.value;
+    syncChips();
+    renderMenu();
+  });
+
+  $("#category-chips").addEventListener("click", function (event) {
+    const chip = event.target.closest(".chip");
+    if (!chip) { return; }
+    filterCat = chip.dataset.cat;
+    $("#category-filter").value = filterCat;
+    syncChips();
+    renderMenu();
+  });
+
+  $("#drink-list").addEventListener("click", function (event) {
+    const row = event.target.closest(".drink-row");
+    if (!row) { return; }
+    selectedId = row.dataset.id;
+    renderMenu();
+  });
+
+  $("#drink-list").addEventListener("dblclick", function (event) {
+    const row = event.target.closest(".drink-row");
+    if (!row) { return; }
+    selectedId = row.dataset.id;
+    renderMenu();
+    addSelectedDrink();
+  });
+
+  $("#add-btn").addEventListener("click", addSelectedDrink);
+
+  $("#order-body").addEventListener("click", function (event) {
+    const button = event.target.closest(".row-remove");
+    if (!button) { return; }
+    cart.splice(Number(button.dataset.index), 1);
+    renderCart();
+    setFeedback("Line removed from the order.", false);
+  });
+
+  $("#clear-btn").addEventListener("click", function () {
+    if (!cart.length) { return; }
+    if (!window.confirm("Clear every line in the current order?")) { return; }
+    cart = [];
+    renderCart();
+    setFeedback("Order cleared. Ready for the next customer.", false);
+  });
+
+  $("#checkout-btn").addEventListener("click", openCheckout);
+}
+
+function syncChips() {
+  Array.prototype.forEach.call(document.querySelectorAll(".chip"), function (chip) {
+    chip.classList.toggle("active", chip.dataset.cat === filterCat);
+  });
+}
+
+/* ---------------- start ---------------- */
+
+renderCategoryOptions();
+renderAddons();
+renderMenu();
+renderCart();
+renderHistory();
+renderInventory();
+renderReports();
+wireEvents();
+
+</script>
+</body>
+</html>

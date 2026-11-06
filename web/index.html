@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Team Dream Cafe — Coffee Shop Management System</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232b1d15'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle'%3E%E2%98%95%3C/text%3E%3C/svg%3E" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+  <aside class="rail">
+    <div class="brand">
+      <div class="brand-name">TEAM DREAM</div>
+      <div class="brand-accent">C A F E</div>
+      <div class="brand-tag">Coffee Shop Management</div>
+    </div>
+
+    <nav id="nav" class="nav">
+      <button class="nav-item active" data-screen="order">Order Taking</button>
+      <button class="nav-item" data-screen="history">Order History</button>
+      <button class="nav-item" data-screen="inventory">Inventory</button>
+      <button class="nav-item" data-screen="reports">Sales Report</button>
+      <button class="nav-item" data-screen="about">About the System</button>
+    </nav>
+
+    <div class="rail-foot">
+      <div class="rail-rule"></div>
+      <p>Build 1.0 &middot; browser demo</p>
+      <p>Java Swing version included</p>
+    </div>
+  </aside>
+
+  <main class="stage">
+    <!-- ================= ORDER TAKING ================= -->
+    <section class="screen active" id="screen-order">
+      <header class="screen-head">
+        <h1>Order Taking</h1>
+        <p>Choose a drink, set the cup size and extras, then add it to the order.</p>
+      </header>
+
+      <div class="pos-grid">
+        <div class="card menu-card">
+          <div class="filters">
+            <input id="search" type="search" placeholder="Search a drink by name" autocomplete="off" />
+            <select id="category-filter"></select>
+          </div>
+
+          <div class="chips" id="category-chips"></div>
+
+          <div class="drink-list" id="drink-list"></div>
+
+          <div class="customizer">
+            <div class="custom-row">
+              <span class="label">SIZE</span>
+              <label class="radio"><input type="radio" name="size" value="M" checked /><span>Medium</span></label>
+              <label class="radio"><input type="radio" name="size" value="L" /><span>Large</span></label>
+              <span class="label qty-label">QTY</span>
+              <input id="qty" class="qty" type="number" min="1" max="99" value="1" />
+            </div>
+
+            <div class="addons" id="addons"></div>
+
+            <div class="custom-row actions-row">
+              <span id="menu-feedback" class="feedback muted"></span>
+              <button id="add-btn" class="btn primary">Add to Order</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card order-card">
+          <div class="order-head">
+            <h2>Current Order</h2>
+            <span id="order-meta" class="muted"></span>
+          </div>
+
+          <div class="table-wrap">
+            <table class="data-table" id="order-table">
+              <thead>
+                <tr><th>Item</th><th>Size</th><th class="num">Qty</th><th class="num">Amount</th><th></th></tr>
+              </thead>
+              <tbody id="order-body"></tbody>
+            </table>
+            <p class="empty-state" id="order-empty">No items yet. Pick a drink on the left.</p>
+          </div>
+
+          <div class="totals">
+            <div><span>Subtotal</span><span id="subtotal">₱0.00</span></div>
+            <div><span>Discount</span><span id="summary-discount">−₱0.00</span></div>
+            <div class="grand"><span>TOTAL</span><span id="total">₱0.00</span></div>
+          </div>
+
+          <div class="custom-row end">
+            <button id="clear-btn" class="btn ghost danger">Clear order</button>
+            <button id="checkout-btn" class="btn primary wide" disabled>Checkout</button>
+          </div>
+          <p class="hint">Tip: click a drink once to select it, double-click to add it instantly.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= HISTORY ================= -->
+    <section class="screen" id="screen-history">
+      <header class="screen-head">
+        <h1>Order History</h1>
+        <p>Every completed sale is saved, with its receipt ready to view again.</p>
+      </header>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data-table" id="history-table">
+            <thead>
+              <tr><th>Reference</th><th>Date &amp; time</th><th class="num">Items</th><th class="num">Discount</th><th class="num">Total</th><th></th></tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+          </table>
+          <p class="empty-state" id="history-empty">No sales recorded yet — complete a checkout to see it here.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= INVENTORY ================= -->
+    <section class="screen" id="screen-inventory">
+      <header class="screen-head">
+        <h1>Inventory</h1>
+        <p>Cups, ingredients and add-ons are deducted automatically after every sale.</p>
+      </header>
+      <div class="stat-row" id="inventory-summary"></div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data-table" id="inventory-table">
+            <thead>
+              <tr><th>Item</th><th class="num">In stock</th><th>Level</th><th>Status</th><th>Restock</th></tr>
+            </thead>
+            <tbody id="inventory-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= REPORTS ================= -->
+    <section class="screen" id="screen-reports">
+      <header class="screen-head">
+        <h1>Sales Report</h1>
+        <p>Today at a glance, based on the sales saved in this browser.</p>
+      </header>
+      <div class="stat-row" id="report-stats"></div>
+      <div class="report-grid">
+        <div class="card">
+          <h3>Best sellers</h3>
+          <div id="best-sellers"></div>
+        </div>
+        <div class="card">
+          <h3>Sales per category</h3>
+          <div id="category-breakdown"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>All recorded sales</h3>
+        <div id="report-totals"></div>
+      </div>
+    </section>
+
+    <!-- ================= ABOUT ================= -->
+    <section class="screen" id="screen-about">
+      <header class="screen-head">
+        <h1>About the System</h1>
+        <p>A Coffee Shop Management System for Team Dream Cafe.</p>
+      </header>
+
+      <div class="about-grid">
+        <div class="card">
+          <h3>Modules</h3>
+          <ul class="bullet-list">
+            <li>Order taking with size, quantity and add-ons</li>
+            <li>Live order summary and peso totals</li>
+            <li>Checkout with discounts, cash and change</li>
+            <li>Printable receipt and saved order history</li>
+            <li>Inventory with automatic stock deduction</li>
+            <li>Sales report with best sellers</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>How it is built</h3>
+          <ul class="bullet-list">
+            <li><strong>Graded deliverable:</strong> Java 17 + Swing (OOP, GUI)</li>
+            <li>Model: MenuItem, Drink, AddOn, OrderItem, Order</li>
+            <li>Inheritance and polymorphism in pricing</li>
+            <li>Strategy pattern for discounts</li>
+            <li><strong>This browser demo:</strong> HTML, CSS and vanilla JavaScript</li>
+            <li>Same menu, prices and rules as the Java build</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Team Dream Cafe — group members</h3>
+        <div class="team-grid">
+          <div class="member">
+            <div class="avatar">JE</div>
+            <div><strong>John Evaris</strong><span>Group creator · project lead &amp; documentation</span></div>
+          </div>
+          <div class="member">
+            <div class="avatar">DC</div>
+            <div><strong>Decerick Chavez</strong><span>Menu model, pricing rules &amp; tests</span></div>
+          </div>
+          <div class="member">
+            <div class="avatar">KY</div>
+            <div><strong>Kenneth Clier Yusores</strong><span>Order-taking screen &amp; interface theme</span></div>
+          </div>
+          <div class="member">
+            <div class="avatar">KE</div>
+            <div><strong>Khyle Etolle</strong><span>Checkout, receipt, inventory &amp; reports</span></div>
+          </div>
+        </div>
+        <p class="hint">Swap the roles around if your actual task split is different — the docs/TEAM.md file has the same table.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="modal-root"></div>
+<div id="toast" class="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
